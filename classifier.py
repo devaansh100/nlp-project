@@ -6,43 +6,34 @@ from sklearn.metrics import accuracy_score, classification_report
 from sklearn.model_selection import train_test_split
 
 def extract_token_embeddings(model, tokenizer, tokens, labels, device):
-    """
-    Extract token embeddings and their corresponding labels efficiently.
-    Assumes all input sequences are of the same length.
-    """
     embeddings = []
     flattened_labels = []
 
-    # Process tokens in batches
-    batch_size = 8  # Adjust based on your GPU memory
+    batch_size = 32
     
     with torch.no_grad():
         for i in range(0, len(tokens), batch_size):
             batch_tokens = tokens[i:i+batch_size]
             batch_labels = labels[i:i+batch_size]
             
-            # Convert to tensors
             inputs = torch.tensor(batch_tokens, dtype=torch.long).to(device)
             
-            # Create attention mask
-            if tokenizer.pad_token_id is None:
-                # If there's no pad token, assume all tokens are valid
-                attention_mask = torch.ones_like(inputs, dtype=torch.long).to(device)
-            else:
-                attention_mask = (inputs != tokenizer.eos_token_id).long().to(device)
+            attention_mask = (inputs != tokenizer.eos_token_id).long().to(device)
             
-            # Forward pass
             outputs = model(inputs, attention_mask=attention_mask)
             token_embeddings = outputs.last_hidden_state
             
-            # Process each sequence in the batch
             for emb, label, mask in zip(token_embeddings, batch_labels, attention_mask):
-                mask = mask.bool()
-                embeddings.append(emb[mask].cpu().numpy())
-                flattened_labels.append(label[mask.cpu().numpy()])
+                valid_mask = (mask.bool() & (torch.tensor(label, device=device) != -1))
+                valid_embeddings = emb[valid_mask].cpu().numpy()
+                valid_labels = label[valid_mask.cpu().numpy()]
+                
+                # Double-check to ensure no -1 labels
+                non_padding_mask = valid_labels != -1
+                embeddings.append(valid_embeddings[non_padding_mask])
+                flattened_labels.append(valid_labels[non_padding_mask])
 
     return np.concatenate(embeddings), np.concatenate(flattened_labels)
-
 
 def main():
     # Load tokenizer and model
@@ -69,9 +60,17 @@ def main():
     print("Extracting token embeddings for validation data...")
     val_features, val_targets = extract_token_embeddings(model, tokenizer, val_tokens, val_labels, device)
 
+    # Check for any remaining -1 labels
+    print(f"Unique labels in train set: {np.unique(train_targets)}")
+    print(f"Unique labels in val set: {np.unique(val_targets)}")
+
+    # Ensure no -1 labels
+    assert -1 not in train_targets, "Found -1 labels in training data"
+    assert -1 not in val_targets, "Found -1 labels in validation data"
+
     # Train a logistic regression classifier
     print("Training logistic regression model...")
-    classifier = LogisticRegression(max_iter=100)
+    classifier = LogisticRegression(max_iter=1000)
     classifier.fit(train_features, train_targets)
 
     # Validate the classifier
