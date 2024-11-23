@@ -25,6 +25,7 @@ def main():
         'test': torch.where(test_indices)[0],
         'train': torch.where(~test_indices)[0]
     }
+    np.save('data/test_indices.npy', torch.where(test_indices)[0].numpy())
     train_tokens, train_labels = [], []
     val_tokens, val_labels = [], []
     for split in indices:

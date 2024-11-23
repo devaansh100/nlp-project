@@ -2,9 +2,8 @@ import numpy as np
 import torch
 from transformers import AutoModel, AutoTokenizer
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score, classification_report
-from sklearn.model_selection import train_test_split
 from tqdm import tqdm
+
 def extract_token_embeddings(model, tokenizer, tokens, labels, device):
     embeddings = []
     flattened_labels = []
@@ -32,6 +31,8 @@ def main():
 
     # Use the appropriate device for Apple Silicon
     device = torch.device("mps") if torch.backends.mps.is_available() else torch.device("cpu")
+    if torch.cuda.is_available():
+        device = torch.device('cuda')
     print(f"Using device: {device}")
     model.to(device)
 

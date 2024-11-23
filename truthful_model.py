@@ -13,7 +13,6 @@ class TruthfulLlama(nn.Module):
 		self.truthful_head.bias.data.copy_(bias)		
 
 	def forward(self, *args, **kwargs):
-		breakpoint()
 		outputs = self.model(*args, **kwargs, output_hidden_states=True)
 		outputs.logits += self.truthful_head(outputs.hidden_states[-1])
 		return outputs
