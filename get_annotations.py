@@ -20,7 +20,7 @@ def main():
     dataset = load_dataset("truthful_qa", "generation")['validation']
         
     # Split data into train/val
-    test_indices = torch.rand(len(dataset)) < 0.1
+    test_indices = torch.rand(len(dataset)) < 0.8
     indices = {
         'test': torch.where(test_indices)[0],
         'train': torch.where(~test_indices)[0]
@@ -41,10 +41,10 @@ def main():
     train_tokens, train_labels = pad_sequence(train_tokens, batch_first=True, padding_value=tokenizer.eos_token_id), pad_sequence(train_labels, batch_first=True, padding_value=-1)
     val_tokens, val_labels = pad_sequence(val_tokens, batch_first=True, padding_value=tokenizer.eos_token_id), pad_sequence(val_labels, batch_first=True, padding_value=-1)
 
-    np.save('train_tokens.npy', train_tokens.numpy())
-    np.save('train_labels.npy', train_labels.numpy())
-    np.save('val_tokens.npy', val_tokens.numpy())
-    np.save('val_labels.npy', val_labels.numpy())
+    np.save('data/train_tokens.npy', train_tokens.numpy())
+    np.save('data/train_labels.npy', train_labels.numpy())
+    np.save('data/val_tokens.npy', val_tokens.numpy())
+    np.save('data/val_labels.npy', val_labels.numpy())
 
 
 if __name__ == "__main__":
