@@ -13,7 +13,7 @@ Repository Structure
 
 - Token-level dataset creation for classifier training
 
-- Classifier training and implementation
+- Classifier training with fixing class imbalance and evaluation on validation dataset
 
 - Inference with the guided decoding approach
 
