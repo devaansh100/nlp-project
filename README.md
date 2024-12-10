@@ -32,7 +32,7 @@ Repository Structure
 ## Additional Files
 
 - ```test_indices.npy```: Contains test split indices for reproducibility
-- ```Modified generation/utils.py```: Contains custom implementation for guided decoding
+- Modified ```generation/utils.py```: Contains custom implementation for guided decoding
 
 ## Implementation Notes
 The implementation requires modifying the transformers library source code, specifically the generation utilities. The modifications enable the guided decoding approach without affecting other model functionalities.
