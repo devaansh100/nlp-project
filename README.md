@@ -37,34 +37,10 @@ Repository Structure
 ## Implementation Notes
 The implementation requires modifying the transformers library source code, specifically the generation utilities. The modifications enable the guided decoding approach without affecting other model functionalities.
 
-## Evaluation
-We evaluate our approach using both automatic metrics (BLEU) and human evaluation (Truthfulness and Informativeness). The evaluation pipeline is fully automated through the provided notebooks.
-
-## Dataset
-We use the TruthfulQA dataset, which is specifically designed to evaluate factual consistency in language model outputs. The dataset processing includes creation of token-level annotations for classifier training.
-
-## Dependencies
-
-- numpy
-
-- torch
-
-- transformers
-
-- scikit-learn
-
-- datasets
-
-- tqdm
-
-- sacrebleu
-
-
-
 ## Usage
 
-- Run NLP_Project.ipynb to train the model and generate outputs
+- Run NLP_Project.ipynb to get the data, train the model and generate outputs
 
-- Use human_eval.ipynb for evaluation of the generated outputs
+- Use the outputs from the previous notebook in human_eval.ipynb for an interface to evaluate truthfulness and informativeness
 
 - Results will be automatically saved and metrics calculated
